@@ -69,7 +69,7 @@ namespace WebApplication2.Pages
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=1337");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=password");
         }
     }
 
