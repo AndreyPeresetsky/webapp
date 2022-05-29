@@ -1,0 +1,27 @@
+﻿@using WebApplicationMVC.Controllers
+
+@for (var i = 0; i < Model.TeacherList?.Count; i++)
+{
+    var mes = Model.TeacherList[i];
+    <h2> <a  href="/Teachers/Teachers?id=@(i+1)"> @mes.idteacher @mes.Fullname </a> </h2>
+}
+@if (Model.ClassList is not null){
+    <h2> </h2>
+    <h2>Предметы:</h2>
+}
+
+@for (var i = 0; i < Model.SubjectList?.Count; i++)
+{
+    var mes = Model.SubjectList[i];
+    <h2>@mes.Name</h2>
+}
+
+@if (Model.ClassList is not null){
+    <h2> <br>Классы:</h2>
+}
+
+@for (var i = 0; i < Model.ClassList?.Count; i++)
+{
+    var mes = Model.ClassList[i];
+    <h2>@mes.Name</h2>
+}
