@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using WebApplicationMVC.Models;
 
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");

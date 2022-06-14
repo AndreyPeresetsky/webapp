@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using WebApplicationMVC.Models;
 
 namespace WebApplicationMVC.Controllers;
@@ -21,9 +20,9 @@ public class TeachersController : Controller
 }
 public class IndexModel_teachers : PageModel
 {
-    public List<Teachers>? TeacherList { get; private set; }
-    public List<Subjects>? SubjectList { get; private set; }
-    public List<Classes>? ClassList { get; private set; }
+    public List<Teacher>? TeacherList { get; private set; }
+    public List<Subject>? SubjectList { get; private set; }
+    public List<Class>? ClassList { get; private set; }
 
     public void OnGet(ApplicationContext db, int? id = null)
     {
@@ -45,31 +44,41 @@ static public class GetTeachersData
     {
         return request.ToString();
     }
-    static public List<Teachers> GetTeacherList(ApplicationContext db)
+    static public List<Teacher> GetTeacherList(ApplicationContext db)
     {
 
-        var teachers = db.Teachers.FromSqlRaw($"SELECT * FROM teacher;").ToList();
-        Console.WriteLine("Teachers:");
-        foreach (var t in teachers)
-            Console.WriteLine(t.idteacher + " " + t.Fullname);
+        var teachers = db.Teachers.ToList();
+        {
+            Console.WriteLine("Teachers:");
+            foreach (var t in teachers)
+                Console.WriteLine(t.Idteacher + " " + t.Fullname);
+        }
         return teachers;
     }
-    static public List<Subjects> GetSubjectList(ApplicationContext db, int? id)
+    static public List<Subject> GetSubjectList(ApplicationContext db, int? id)
     {
-
-        string requestsql = $"select distinct subject.idsubject, name from subject join (select distinct * from learningactivities join teacher on teacher.idteacher = learningactivities.idteacher where teacher.idteacher = {id}) t on subject.idsubject = t.idsubject;";
-        var subjects = db.Subjects.FromSqlRaw(requestsql).ToList();
-        Console.WriteLine("subjects:");
-        foreach (var s in subjects)
-            Console.WriteLine(s.idsubject + " " + s.Name);
-        return subjects;
-        
+        var subjects = (from c in db.Subjects
+                        join l in db.Learningactivities on c.Idsubject equals l.Idsubject
+                        join t in db.Teachers on l.Idteacher equals t.Idteacher
+                        where t.Idteacher == id
+                        orderby c
+                        select c).Distinct().ToList();
+        {
+            Console.WriteLine("Subjects:");
+            foreach (var s in subjects)
+                Console.WriteLine(s.Idsubject + " " + s.Name);
+        }
+        return subjects;        
     }
 
-    static public List<Classes> GetClassList(ApplicationContext db, int? id)
-    {
-        string requestsql = $"select distinct class.idclass, name from class join (select distinct * from learningactivities join teacher on teacher.idteacher = learningactivities.idteacher where teacher.idteacher = {id}) t on class.idclass = t.idclass;";
-        var classes = db.Classes.FromSqlRaw(requestsql).ToList();
+    static public List<Class> GetClassList(ApplicationContext db, int? id)
+    { 
+        var classes = (from c in db.Classes
+                       join l in db.Learningactivities on c.Idclass equals l.Idclass
+                       join t in db.Teachers on l.Idteacher equals t.Idteacher
+                       where t.Idteacher == id
+                       orderby c
+                       select c).Distinct().ToList();
         Console.WriteLine("Classes");
         foreach (var c in classes)
             Console.WriteLine(c.Idclass + " " + c.Name);
